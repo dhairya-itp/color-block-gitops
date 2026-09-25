@@ -46,3 +46,9 @@ variable "argocd_allowed_cidrs" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
+
+variable "github_token" {
+  description = "Fine-grained GitHub token for the deck's bridge: color-block-gitops only, Contents read/write, Checks read. Put it in terraform.tfvars (git-ignored), never in a committed file."
+  type        = string
+  sensitive   = true
+}

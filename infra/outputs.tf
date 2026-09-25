@@ -27,3 +27,9 @@ output "deck_url" {
   description = "The deck on its NLB. Presenter: open it once with ?key=<DEMO_KEY>."
   value       = "echo http://$(kubectl -n deck get svc deck -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 }
+
+output "demo_key" {
+  description = "Presenter key. Show it with: terraform output -raw demo_key"
+  value       = random_password.demo_key.result
+  sensitive   = true
+}

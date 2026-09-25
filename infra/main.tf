@@ -118,5 +118,6 @@ resource "helm_release" "color_block_app" {
     }
   })]
 
-  depends_on = [helm_release.argocd, helm_release.aws_lb_controller]
+  # The deck pod needs its Secret before it can start.
+  depends_on = [helm_release.argocd, helm_release.aws_lb_controller, kubernetes_secret_v1.deck]
 }

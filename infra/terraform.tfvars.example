@@ -1,1 +1,2 @@
-owner = "you@example.com"
+owner        = "you@example.com"
+github_token = "github_pat_..."
