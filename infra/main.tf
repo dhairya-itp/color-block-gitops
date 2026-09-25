@@ -97,9 +97,9 @@ resource "helm_release" "argocd" {
   depends_on = [module.eks, helm_release.aws_lb_controller]
 }
 
-# The Application is defined once, in argocd/application.yaml, and installed through the argocd-apps chart.
+# Each Application is defined once, in argocd/*.yaml, and installed through the argocd-apps chart.
 locals {
-  app = yamldecode(file("${path.module}/../argocd/application.yaml"))
+  apps = [for f in ["application.yaml", "deck.yaml"] : yamldecode(file("${path.module}/../argocd/${f}"))]
 }
 
 resource "helm_release" "color_block_app" {
@@ -111,9 +111,9 @@ resource "helm_release" "color_block_app" {
 
   values = [yamlencode({
     applications = {
-      (local.app.metadata.name) = merge(local.app.spec, {
-        namespace  = local.app.metadata.namespace
-        finalizers = local.app.metadata.finalizers
+      for app in local.apps : app.metadata.name => merge(app.spec, {
+        namespace  = app.metadata.namespace
+        finalizers = app.metadata.finalizers
       })
     }
   })]

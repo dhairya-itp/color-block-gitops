@@ -1,7 +1,7 @@
 name: validate
 on:
   push:
-    paths: ["k8s/**", ".github/workflows/validate.yml"]
+    paths: ["k8s/**", "deck/**", ".github/workflows/validate.yml"]
   pull_request:
 
 jobs:
@@ -12,7 +12,7 @@ jobs:
       - name: Schema-check manifests (kubeconform)
         run: |
           curl -sSL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar xz
-          ./kubeconform -strict -summary k8s/
+          ./kubeconform -strict -summary k8s/ deck/
       - name: COLOR is a hex value
         run: |
           grep -A1 -- '- name: COLOR' k8s/deployment.yaml | grep -Eq 'value: "#[0-9A-Fa-f]{6}"'

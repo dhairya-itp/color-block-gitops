@@ -56,7 +56,7 @@ resource "terraform_data" "delete_load_balancers" {
       export KUBECONFIG="$(mktemp)"
       trap 'rm -f "$KUBECONFIG"' EXIT
       aws eks update-kubeconfig --name ${self.input.cluster} --region ${self.input.region} >/dev/null
-      kubectl -n argocd delete application color-block --ignore-not-found --wait --timeout=5m
+      kubectl -n argocd delete application color-block deck --ignore-not-found --wait --timeout=5m
       kubectl -n argocd delete service argocd-server --ignore-not-found --wait --timeout=5m
     EOT
   }

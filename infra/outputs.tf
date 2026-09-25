@@ -17,3 +17,13 @@ output "website_url" {
   description = "The color-block website on its NLB."
   value       = "echo http://$(kubectl -n demo get svc color-block -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 }
+
+output "deck_image_repo" {
+  description = "Push the deck image here (see the deck repo README)."
+  value       = aws_ecr_repository.deck.repository_url
+}
+
+output "deck_url" {
+  description = "The deck on its NLB. Presenter: open it once with ?key=<DEMO_KEY>."
+  value       = "echo http://$(kubectl -n deck get svc deck -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+}

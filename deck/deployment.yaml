@@ -1,0 +1,54 @@
+# The slide deck plus the live-demo bridge (image built from the deck repo's Dockerfile).
+# Exactly one replica: the bridge keeps the demo state in memory.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deck
+  labels:
+    app: deck
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: deck
+  template:
+    metadata:
+      labels:
+        app: deck
+    spec:
+      serviceAccountName: deck
+      containers:
+        - name: deck
+          # Push a new tag to ECR, change it here, commit: Argo CD deploys it.
+          image: 981137913275.dkr.ecr.ap-south-1.amazonaws.com/scd-deck:v1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SITE_URL
+              value: http://color-block.demo.svc.cluster.local
+            - name: NODE_EXTRA_CA_CERTS
+              value: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            # Created by hand, never in Git: kubectl -n deck create secret generic deck-secrets ...
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: deck-secrets
+                  key: GITHUB_TOKEN
+            - name: DEMO_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: deck-secrets
+                  key: DEMO_KEY
+          readinessProbe:
+            httpGet:
+              path: /api/state
+              port: 8080
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
