@@ -1,0 +1,20 @@
+# The stock nginx image runs envsubst on /etc/nginx/templates/*.template at startup,
+# so ${COLOR} and ${POD_NAME} come straight from the pod's environment. No custom image.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: color-block-nginx
+data:
+  default.conf.template: |
+    server {
+      listen 80;
+      location = /healthz { access_log off; default_type text/plain; return 200 "ok\n"; }
+      location = /color.json {
+        default_type application/json;
+        return 200 '{"color":"${COLOR}","pod":"${POD_NAME}"}';
+      }
+      location / {
+        default_type text/html;
+        return 200 '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>color-block</title></head><body style="margin:0;height:100vh;display:grid;place-items:center;background:${COLOR};font:600 20px system-ui,sans-serif"><div style="background:#fff;padding:14px 20px;border-radius:12px">${COLOR} &middot; served by ${POD_NAME}</div></body></html>';
+      }
+    }

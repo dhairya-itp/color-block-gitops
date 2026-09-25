@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: color-block
+  labels:
+    app: color-block
+spec:
+  replicas: 4
+  minReadySeconds: 3
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: color-block
+  template:
+    metadata:
+      labels:
+        app: color-block
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: web
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+          env:
+            # The live demo changes only this value. Argo CD rolls it out.
+            - name: COLOR
+              value: "#3B82F6"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+            periodSeconds: 2
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "3"]
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+          volumeMounts:
+            - name: templates
+              mountPath: /etc/nginx/templates
+      volumes:
+        - name: templates
+          configMap:
+            name: color-block-nginx
