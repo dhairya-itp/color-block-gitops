@@ -79,9 +79,22 @@ resource "helm_release" "argocd" {
         "timeout.reconciliation.jitter" = "0s"
       }
     }
+    # The UI on a public NLB. It stays HTTPS with Argo CD's self-signed certificate.
+    server = {
+      service = {
+        type = "LoadBalancer"
+        annotations = {
+          "service.beta.kubernetes.io/aws-load-balancer-type"            = "external"
+          "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type" = "ip"
+          "service.beta.kubernetes.io/aws-load-balancer-scheme"          = "internet-facing"
+        }
+        loadBalancerSourceRanges = var.argocd_allowed_cidrs
+      }
+    }
   })]
 
-  depends_on = [module.eks]
+  # The controller must be running before this Service asks for a load balancer.
+  depends_on = [module.eks, helm_release.aws_lb_controller]
 }
 
 # The Application is defined once, in argocd/application.yaml, and installed through the argocd-apps chart.
@@ -105,5 +118,5 @@ resource "helm_release" "color_block_app" {
     }
   })]
 
-  depends_on = [helm_release.argocd]
+  depends_on = [helm_release.argocd, helm_release.aws_lb_controller]
 }

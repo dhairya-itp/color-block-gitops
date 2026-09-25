@@ -8,10 +8,12 @@ output "argocd_password" {
   value       = "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d"
 }
 
-output "argocd_ui" {
-  value = "kubectl -n argocd port-forward svc/argocd-server 8443:443   # https://localhost:8443"
+output "argocd_url" {
+  description = "Argo CD UI on its NLB (DNS takes 2-3 min after the NLB is created). Self-signed cert: accept the warning."
+  value       = "echo https://$(kubectl -n argocd get svc argocd-server -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 }
 
-output "website" {
-  value = "kubectl -n demo port-forward svc/color-block 8080:80   # http://localhost:8080"
+output "website_url" {
+  description = "The color-block website on its NLB."
+  value       = "echo http://$(kubectl -n demo get svc color-block -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 }

@@ -40,3 +40,9 @@ variable "argocd_chart_version" {
   type        = string
   default     = "10.9.2"
 }
+
+variable "argocd_allowed_cidrs" {
+  description = "Who can reach the Argo CD UI load balancer. Narrow it to your IP (x.x.x.x/32) if you can."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}

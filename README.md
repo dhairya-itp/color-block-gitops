@@ -8,7 +8,7 @@ push, and Argo CD rolls the new color out to every pod on Amazon EKS. Nothing el
 ```
 k8s/          what runs in the cluster (Deployment, Service, nginx template)
 argocd/       the Argo CD Application (auto-sync, prune, self-heal)
-infra/        Terraform: VPC, EKS (managed node group), Argo CD and this app
+infra/        Terraform: VPC, EKS, AWS Load Balancer Controller, Argo CD and this app
 .github/      manifest validation on every push
 ```
 
@@ -24,9 +24,10 @@ aws eks update-kubeconfig --name scd --region ap-south-1
 
 # edit COLOR in k8s/deployment.yaml, commit, push, then watch:
 kubectl -n demo get pods -w
-kubectl -n demo port-forward svc/color-block 8080:80   # http://localhost:8080
+terraform output -raw website_url | bash    # the website's public NLB URL
+terraform output -raw argocd_url | bash     # Argo CD UI (self-signed cert; user admin)
 
-terraform destroy          # delete everything when you're done (EKS bills by the hour)
+terraform destroy          # deletes the NLBs first, then everything else (EKS bills by the hour)
 ```
 
 Want to see self-heal? Change the cluster by hand and watch Argo CD put it back:

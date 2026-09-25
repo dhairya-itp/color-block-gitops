@@ -1,10 +1,16 @@
+# A public Network Load Balancer, created by the AWS Load Balancer Controller (see infra/load-balancer.tf).
 apiVersion: v1
 kind: Service
 metadata:
   name: color-block
   labels:
     app: color-block
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: external
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
 spec:
+  type: LoadBalancer
   selector:
     app: color-block
   ports:
