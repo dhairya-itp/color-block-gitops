@@ -10,9 +10,9 @@ variable "cluster_name" {
 }
 
 variable "kubernetes_version" {
-  description = "EKS Kubernetes version. null uses the EKS default."
+  description = "EKS Kubernetes version. Must be set: the node group needs it at plan time."
   type        = string
-  default     = null
+  default     = "1.36"
 }
 
 variable "node_instance_type" {
