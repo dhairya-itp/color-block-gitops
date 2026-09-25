@@ -30,7 +30,7 @@ spec:
           env:
             # The live demo changes only this value. Argo CD rolls it out.
             - name: COLOR
-              value: "#3B82F6"
+              value: "#22C55E"
             - name: POD_NAME
               valueFrom:
                 fieldRef:
