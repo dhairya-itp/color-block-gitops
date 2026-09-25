@@ -3,8 +3,11 @@ data "aws_availability_zones" "available" {
 }
 
 locals {
-  azs  = slice(data.aws_availability_zones.available.names, 0, 3)
-  tags = { Project = "commit-to-production-demo" }
+  azs = slice(data.aws_availability_zones.available.names, 0, 3)
+  tags = {
+    Project = "commit-to-production-demo"
+    Owner   = var.owner
+  }
 }
 
 # Public subnets only: nodes get public IPs and reach the EKS API, ECR and GitHub

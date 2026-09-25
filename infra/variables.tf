@@ -4,6 +4,16 @@ variable "region" {
   default     = "ap-south-1"
 }
 
+variable "owner" {
+  description = "Owner tag on every resource. Some AWS orgs deny EC2 launches without it (use your work email)."
+  type        = string
+
+  validation {
+    condition     = can(regex("^[^@\\s]+@[^@\\s]+\\.[a-z]+$", var.owner))
+    error_message = "owner must be an email address."
+  }
+}
+
 variable "cluster_name" {
   type    = string
   default = "scd"
